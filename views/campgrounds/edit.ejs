@@ -1,0 +1,86 @@
+<%layout('layouts/boilerplate') -%>
+<h1 class="text-center">Edit Campground</h1>
+<div class="col-6 offset-3">
+  <form
+    action="/campgrounds/<%=campground._id%>?_method=PUT"
+    method="POST"
+    novalidate
+    class="needs-validation"
+  >
+    <div class="mb-3">
+      <label for="title">Title:</label>
+      <!-- name= 'campground[title]' will store whatever is in the braket under campground while sending post req -->
+      <input
+        class="form-control"
+        type="text"
+        id="title"
+        name="campground[title]"
+        value="<%= campground.title %> "
+        required
+      />
+      <div class="invalid-feedback">This field should not be empty.</div>
+    </div>
+
+    <div class="mb-3">
+      <label for="location">Location:</label>
+      <input
+        class="form-control"
+        type="text"
+        id="location"
+        name="campground[location]"
+        value="<%= campground.location %>"
+        required
+      />
+    </div>
+    <div class="input-group mb-3">
+      <span class="input-group-text">$</span>
+      <input
+        type="Number"
+        class="form-control"
+        placeholder="0.00"
+        aria-label="price"
+        name="campground[price]"
+        value="<%= campground.price %>"
+        required
+      />  <div class="invalid-feedback">
+        This field should not be empty.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="image">Image Url:</label>
+      <input
+        class="form-control"
+        type="text"
+        id="image"
+        name="campground[image]"
+        value="<%= campground.image %>"
+        required
+      />  <div class="invalid-feedback">
+        This field should not be empty.
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="description">Description:</label>
+      <textarea
+        class="form-control"
+        type="text"
+        id="description"
+        name="campground[description]"
+        required
+      > >
+      <%= campground.description %>
+      </textarea>
+      <div class="invalid-feedback">
+        This field should not be empty.
+      </div>
+    </div>
+    <button class="btn btn-info">Update Campground</button>
+  </form>
+  <div>
+    <p>
+      <a href="/campgrounds" class="btn btn-secondary mt-3">Back to campgrounds</a>
+    </p>
+    <p><a class="btn btn-success mt-2 " href="/campgrounds/<%= campground._id%>"> details      </a></p>
+  </div>
+</div>
