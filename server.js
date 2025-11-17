@@ -5,14 +5,14 @@ const path = require("path");
 const mongoose = require("mongoose");
 const ejsMate = require("ejs-mate");
 // mongoose
-// const Joi = require('joi');
+
 const {campgroundSchema}=require('./validateSchema.js')
-const catchAsync= require("./utils/catchAsync");
-const ExpressError= require("./utils/ExpressError")
+const catchAsync= require("./utils/catchAsync.js");
+const ExpressError= require("./utils/ExpressError.js")
 const methodOverride = require("method-override");
 require('dotenv').config();
 const morgan = require("morgan");
-const Campground = require("./models/campground");
+const Campground = require("./models/campground.js");
 
   mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("mongoose Database connected"))
@@ -43,19 +43,35 @@ const validateCampground=(req,res,next)=>{
 
 
 
-//home
-app.get("/", async(req, res) => {
-    const campgrounds = await Campground.find({});
 
-  res.render("campgrounds/index", { campgrounds });
+// //all
+// app.get("/campgrounds", catchAsync(async (req, res) => {
+//   // use Model name.find
+//   const campgrounds = await Campground.find({});
+//   res.render("campgrounds/index", { campgrounds });
+// }));
+
+app.get("/campgrounds", catchAsync(async (req, res) => {
+  const { q } = req.query;
+
+  // If search query is provided
+  let campgrounds;
+  if (q) {
+    campgrounds = await Campground.find({
+  $or: [
+    { title: { $regex: q, $options: "i" } },
+    { location: { $regex: q, $options: "i" } },
+    { description: { $regex: q, $options: "i" } }
+  ]
 });
 
-//all
-app.get("/campgrounds", catchAsync(async (req, res) => {
-  // use Model name.find
-  const campgrounds = await Campground.find({});
-  res.render("campgrounds/index", { campgrounds });
+  } else {
+    campgrounds = await Campground.find({});
+  }
+
+  res.render("campgrounds/index", { campgrounds, q });
 }));
+
 //create new camp
 app.get("/campgrounds/new",(req, res) => {
   res.render("campgrounds/new");
@@ -71,11 +87,11 @@ app.post("/campgrounds", validateCampground,catchAsync(async (req, res,next) => 
 
 }));
 
-//show details
+//View details
 app.get("/campgrounds/:id", catchAsync(async (req, res) => {
   const { id } = req.params;
   const campground = await Campground.findById(id);
-  res.render("campgrounds/show", { campground });
+  res.render("campgrounds/viewDetails", { campground });
 }));
 
 //edit
@@ -101,7 +117,7 @@ app.delete("/campgrounds/:id", catchAsync(async (req, res) => {
   const d = await Campground.findByIdAndDelete(id);
   res.redirect("/campgrounds");
 }));
-app.all('*',(req,res,next)=>{
+app.all('/*',(req,res,next)=>{
   next(new ExpressError('PATH IS WRONG/ Page not found',404))
   
 })

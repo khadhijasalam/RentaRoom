@@ -1,6 +1,26 @@
 <%layout('layouts/boilerplate') -%>
 <body>
-  <h1>All Campgrounds</h1>
+ 
+
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+
+  <h1 class="m-0">All Campgrounds</h1>
+
+  <form action="/campgrounds" method="GET" class="d-flex mt-2 mt-md-0">
+    <input 
+      type="text" 
+      name="q" 
+      class="form-control me-2"
+      placeholder="Search campgrounds..."
+      value="<%= typeof q !== 'undefined' ? q : '' %>"
+    />
+    <button type="submit" class="btn btn-primary">Search</button>
+  </form>
+
+</div>
+
+
+</div>
   <a class="btn btn-secondary mb-3" href="/campgrounds/new"
     >Add New Campgrounds</a
   >
