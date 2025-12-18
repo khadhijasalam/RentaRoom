@@ -6,13 +6,14 @@ const mongoose = require("mongoose");
 const ejsMate = require("ejs-mate");
 // mongoose
 
-const {campgroundSchema}=require('./validateSchema.js')
+const {campgroundSchema , reviewSchema}=require('./validateSchema.js')
 const catchAsync= require("./utils/catchAsync.js");
 const ExpressError= require("./utils/ExpressError.js")
 const methodOverride = require("method-override");
 require('dotenv').config();
 const morgan = require("morgan");
 const Campground = require("./models/campground.js");
+const Review= require('./models/review.js')
 
   mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("mongoose Database connected"))
@@ -38,6 +39,20 @@ const validateCampground=(req,res,next)=>{
     next();
    }
   
+   
+}
+const validateReview=(req,res,next)=>{
+  
+   const {error}= reviewSchema.validate(req.body);
+   if(error){
+    const msg= error.details.map(el=> el.message).join(',')
+    throw new ExpressError(msg,400)
+   }else{
+    //crucial;
+    next();
+   }
+  
+
 }
 
 
@@ -72,6 +87,7 @@ app.get("/campgrounds", catchAsync(async (req, res) => {
   res.render("campgrounds/index", { campgrounds, q });
 }));
 
+
 //create new camp
 app.get("/campgrounds/new",(req, res) => {
   res.render("campgrounds/new");
@@ -90,10 +106,23 @@ app.post("/campgrounds", validateCampground,catchAsync(async (req, res,next) => 
 //View details
 app.get("/campgrounds/:id", catchAsync(async (req, res) => {
   const { id } = req.params;
-  const campground = await Campground.findById(id);
+  const campground = await Campground.findById(id).populate('reviews');
+  console.log(campground)
   res.render("campgrounds/viewDetails", { campground });
 }));
 
+app.post("/campgrounds/:id/reviews",validateReview,catchAsync(async(req,res)=>{
+  const campground= await Campground.findById(req.params.id);
+  const review = new Review(req.body.review)
+  campground.reviews.push(review)
+  await review.save()
+  await campground.save()
+  res.redirect(`/campgrounds/${campground._id}`)
+
+
+
+  // res.send("Its Hitting ")
+}))
 //edit
 app.get("/campgrounds/:id/edit", catchAsync(async (req, res) => {
   const campground = await Campground.findById(req.params.id);
@@ -131,7 +160,7 @@ app.use((err,req,res,next)=>{
 
 })
 
-// console.log(__dirname)
+console.log(__dirname)
 app.listen(3000, () => {
   console.log("Serving on port 3000");
 });

@@ -20,7 +20,7 @@ description:{
 location:{
   type:String
 },
-review:[
+reviews:[
   {type: Schema.Types.ObjectId,
   ref:'Review'}
 ]

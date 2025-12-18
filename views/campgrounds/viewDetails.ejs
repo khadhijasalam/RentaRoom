@@ -1,9 +1,9 @@
 <%layout('layouts/boilerplate') -%>
 
 <div class="row">
-  <div class="col-sm-6 offset-3" >
-  <div class="card"style="width: 25rem"  >
-    <img src="<%= campground.image%>" class="card-img-top" alt="..." />
+  <div class="col-6 d-flex justify-content-end"   >
+  <div class="card  " style="width:30rem">
+    <img src="<%= campground.image%>"  class="card-img-top" alt="..." />
     <div class="card-body">
       <h5 class="card-title"><%= campground.title %></h5>
       <p class="card-text">
@@ -25,10 +25,44 @@
       2 days ago
     </div>
     
+    
+    
+          </div>
+
+
+  </div>
+  <div class="col-6"><div >Leave a review</div>
+  <form  action="/campgrounds/<%=campground._id%>/reviews" method="POST" class="mb-4 needs-validation" novalidate>
+      <div class="mb-3">
+        <label class="form-label"for="rating">Rating</label>
+        <input  class="form-range" type="range" min="1" max="5" name="review[rating]" id="rating"/> 
+
+ 
+      </div>
+      <div class="mb-3">
+        <label class="form-label"for="body">Review</label>
+        <textarea  class="form-control" name="review[body]" id="body" cols="30" rows="3"  required></textarea>
+        </textarea>
+        <div class="valid-feedback">Looks good!</div>
+      </div>
+     
+      <button class="btn btn-success">
+Submit Review
+      </button>
+
+    </form>
+    
+    <% for (let review of campground.reviews) {%>
+<div class="mb-3 card">
+  <div class="card-body">
+      <h5class="card-title">Rating: <%= review.rating %></h5>
+      <p class="card-text"><%= review.body %></p>
+      
+</div>
+</div>
+    <%}%>
     <ul class="list-group list-group-flush">
       <a href="/campgrounds" class="card-link btn btn-secondary d-inline">Back to Campgrounds</a>
     </ul>
-  </div>
-    </div>
-  </div>
+    </div></div>
 </body>
