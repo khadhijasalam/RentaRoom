@@ -111,6 +111,9 @@ app.get("/campgrounds/:id", catchAsync(async (req, res) => {
   res.render("campgrounds/viewDetails", { campground });
 }));
 
+
+
+// Reviews
 app.post("/campgrounds/:id/reviews",validateReview,catchAsync(async(req,res)=>{
   const campground= await Campground.findById(req.params.id);
   const review = new Review(req.body.review)
@@ -119,10 +122,17 @@ app.post("/campgrounds/:id/reviews",validateReview,catchAsync(async(req,res)=>{
   await campground.save()
   res.redirect(`/campgrounds/${campground._id}`)
 
-
-
-  // res.send("Its Hitting ")
 }))
+
+app.delete('/campgrounds/:id/reviews/:reviewId',catchAsync(async(req,res)=>{
+
+  const {id, reviewId}= req.params
+  await Campground.findByIdAndUpdate(id, {$pull:{reviews:reviewId}})
+  await Review.findByIdAndDelete(reviewId)
+  res.redirect(`/campgrounds/${id}`);
+
+})
+)
 //edit
 app.get("/campgrounds/:id/edit", catchAsync(async (req, res) => {
   const campground = await Campground.findById(req.params.id);
@@ -150,6 +160,7 @@ app.all('/*',(req,res,next)=>{
   next(new ExpressError('PATH IS WRONG/ Page not found',404))
   
 })
+
 app.use((err,req,res,next)=>{
   const {statusCode=500, message='Page not working'}= err;
   if(!err.message) err.message='Oh No, Something Went Wrong!'
